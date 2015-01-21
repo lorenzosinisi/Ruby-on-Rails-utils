@@ -1,0 +1,143 @@
+ <% if alert %>
+  <p class="alert"><%= alert %></p>
+ <% end %>
+ <script>
+
+  var options1 = {
+    enableHighAccuracy: true,
+    maximumAge: 1000
+  };
+  window.setInterval(function(){
+    initiate_geolocation1();
+  }, 5000); 
+  function initiate_geolocation1() {
+    navigator.geolocation.getCurrentPosition(handle_geolocation_query1,handle_errors1, options1);
+  }
+  function handle_errors1(error)
+  {
+  }
+ 
+  function handle_geolocation_query1(position1){
+      latitude = position1.coords.latitude;
+      longitude  = position1.coords.longitude;
+      address  = position1.coords.address;
+
+      var str1 = '<%= @latitudine %>';
+      var str2 = latitude.toFixed(2);
+      var str3 = '<%= @longitudine %>';
+      var str4 = longitude.toFixed(2);
+      // Tests to see if str1 is equal to str2
+        if(str1 == str2 && str3 == str4) {
+         // alert("Equal"); 
+        } else {
+          window.setInterval(function(){
+             location.reload();
+          }, 10000);
+
+        }
+    }
+
+ </script>
+
+		<% if @latitudine == '0.00' %>
+		
+		  <script type="text/javascript">
+		    $(".header_ring").hide();
+		    window.setInterval(function(){
+		        location.reload();
+		    }, 3000);
+		  </script>
+		
+		  <center>		  	<div style="margin-left: -83px !important;" class="gps_ring"></div>		  </center>		  
+		<% else %>		
+		<%= render 'form' %>
+
+<br />
+
+<center>
+  <input id="ReloadPage" class="btn btn-small" type="button" value="refresh" style="width:100%; background-color:#f5f5f5;"><br /><br />
+</center>
+
+
+
+   <table class="table">
+   <tbody>
+		<center id="loading_posts" >
+	  <div style="margin-left: -83px !important;" class="gps_ring"></div>
+	</center>
+    <div id="posts">
+    <% @posts.limit(50).each do |post| %>
+    <%= render "post", :post => post %>
+    <% end %>
+  </div>
+
+	<div class="by_team">
+	
+	<% if @user.posts.count > 0 %>
+		 
+		 <% if @posts.count == 0 && @posts_away.count >= 1 %>
+		          <% if  @latitudine.to_i < 45 && @latitudine.to_i > 34 && @longitudine.to_i > 5 && @longitudine.to_i < 20  %>
+		              <blockquote style="border: 1px solid #efefef; background: none repeat scroll 0 0 #F8FBFE">
+		              <p style="font-size:14px">No Smell here yet. Go away from here and find Smell around you, read <a style="color: #000;text-decoration: underline;" href="/about">"how Smell works"</a> or publish a post now.</p>
+		                <footer style="font-size:10px">by <cite title="Source Title">Smell Team</cite></footer>
+		              </blockquote>
+		          <% else %>
+		              <blockquote style="border: 1px solid #efefef; background: none repeat scroll 0 0 #F8FBFE">
+		              <p style="font-size:14px; color: #d3d3d3s">You have a mission: invite 2 friends who are no more than 1.5 miles away from you and ask them to write something then tap on "refresh" and see the magic.</p>
+		                <footer style="font-size:10px">by <cite title="Source Title">Smell Team</cite></footer>
+		              </blockquote>
+		            <% end %>
+		
+		      <% elsif @posts.count == 0 && @posts_away.count == 0 %> 
+		
+		          <% if  @latitudine.to_i < 45 && @latitudine.to_i > 34 && @longitudine.to_i > 5 && @longitudine.to_i < 20  %>
+		              <blockquote style="border: 1px solid #efefef; background: none repeat scroll 0 0 #F8FBFE">
+		              <p style="font-size:14px">No Smell here yet. Publish a post now.</p>
+		                <footer style="font-size:10px">by <cite title="Source Title">Smell Team</cite></footer>
+		              </blockquote>
+		          <% else %>
+		              <blockquote style="border: 1px solid #efefef; background: none repeat scroll 0 0 #F8FBFE">
+		              <p style="font-size:14px; color: #d3d3d3s">Share a new Smell here</p>
+		                <footer style="font-size:10px">by <cite title="Source Title">Smell Team</cite></footer>
+		              </blockquote>
+		            <% end %>
+		
+		       <% end %> 
+		
+	<% elsif @user.posts.count == 0 %>
+
+
+		 <% if @posts.count == 0 && @posts_away.count >= 1 %>
+		          <% if  @latitudine.to_i < 45 && @latitudine.to_i > 34 && @longitudine.to_i > 5 && @longitudine.to_i < 20  %>
+		              <blockquote style="border: 1px solid #efefef; background: none repeat scroll 0 0 #F8FBFE">
+		              <p style="font-size:14px">No Smell here yet. Go away from here and find Smell around you, read "about" page or publish a post now.</p>
+		                <footer style="font-size:10px">by <cite title="Source Title">Smell Team</cite></footer>
+		              </blockquote>
+		          <% else %>
+		              <blockquote style="border: 1px solid #efefef; background: none repeat scroll 0 0 #F8FBFE">
+		              <p style="font-size:14px; color: #d3d3d3s">You have a mission: invite 2 friends who are no more than 1.5 miles away from you and ask them to write something then tap on "refresh" and see the magic.</p>
+		                <footer style="font-size:10px">by <cite title="Source Title">Smell Team</cite></footer>
+		              </blockquote>
+		           <% end %>
+		
+		 <% elsif @posts.count == 0 && @posts_away.count == 0 %> 
+		
+		           <% if  @latitudine.to_i < 45 && @latitudine.to_i > 34 && @longitudine.to_i > 5 && @longitudine.to_i < 20  %>
+		                <blockquote style="border: 1px solid #efefef; background: none repeat scroll 0 0 #F8FBFE">
+		                <p style="font-size:14px">You have a mission: invite 2 friends who are no more than 1.5 miles away from you and ask them to write something then tap on "refresh" and see the magic.</p>
+		                  <footer style="font-size:10px">by <cite title="Source Title">Smell Team</cite></footer>
+		                </blockquote>
+		           <% else %>
+		                <blockquote style="border: 1px solid #efefef; background: none repeat scroll 0 0 #F8FBFE">
+		                <p style="font-size:14px; color: #d3d3d3s">You have a mission: invite 2 friends who are no more than 1.5 miles away from you and ask them to write something then tap on "refresh" and see the magic.</p>
+		                  <footer style="font-size:10px">by <cite title="Source Title">Smell Team</cite></footer>
+		                </blockquote>
+		           <% end %>
+		      
+		 <% end %> 		 
+  <% end %>
+		</tbody>
+		</table>
+		</div>
+		</div>
+<% end %>

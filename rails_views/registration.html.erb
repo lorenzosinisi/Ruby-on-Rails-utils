@@ -1,0 +1,74 @@
+<h2>Registrati gratuitamente</h2>
+<p> Il servizio è totalmente gratuito. Non devi pagare nulla per utilizzare il servizio. E se un giorno vuoi cancellare la registrazione, puoi farlo facilmente! </p>
+<p>Completa correttamente tutti i campi per usufruire del servizio</p>
+<% if notice %>
+  <p class="alert alert-notice"><%= notice %></p>
+<% end %>
+<% if alert %>
+  <p class="alert alert-error"><%= alert %></p>
+<% end %>
+<%= form_for(resource, :as => resource_name, :url => registration_path(resource_name)) do |f| %>
+  <%= devise_error_messages! %>
+
+  <p><%= f.label :email %>: 
+ 	<% if data = session["devise.facebook_data"] && session["devise.facebook_data"]["extra"]["raw_info"]
+          email = data["email"]
+          gender = data["gender"]
+          @facebook = 1       
+		%>
+	<%= f.email_field :email, :autofocus => true, :class => "form-control", :value => "#{email}" %></p>	 
+   	<% else @facebook = 0 %>
+   	<%= f.email_field :email, :autofocus => true, :class => "form-control", :placeholder => "tua@email.com" %></p>
+   	<% end %> 
+  
+ <br>
+
+<b>Interessato a</b>:
+   <% for interest in Interest.find(:all) %> 
+        <div> 
+<p>
+         <%= check_box_tag "user[interest_ids][]", interest.id,  {:checked => "checked"} %> 
+          <%= interest.name %> </p>
+        </div> 
+    <% end %><hr>
+<p>
+
+
+<!-- SESSO -->
+
+<br />Sesso: 
+    <% if @facebook == 1 %>
+    	<% if gender == "male" %>
+    		<%= f.select :sex, options_for_select(['M']), :class => "form-control"%></p>
+    	<% elsif gender == "female" %> 
+    		<%= f.select :sex, options_for_select(['F']), :class => "form-control"%></p>
+    	<% else %> 
+     <%= f.select :sex, options_for_select(['M', 'F']), :include_blank => true, :class => "form-control"%></p>  	
+    	<%	end %>
+    <% end %>
+    <% if @facebook == 0 %> 
+    	<%= f.select :sex, options_for_select(['M', 'F']), :include_blank => true, :class => "form-control"%></p>  
+    <% end %></p>  
+   
+   <p>Anno di nascita: <%= f.select :age, options_for_select(1940..1998), :include_blank => true,  :class => "form-control"%> </p><br><br>
+   <p><b>CAP: </b> </p><%= f.text_field :city, :class => "form-control", :placeholder => "codice avv. postale" %></p>
+<br>
+
+
+<!-- FINE SESSO -->
+
+  <p><b>Numero di cellulare (valido)</b></p>
+  <div class="input-group">  <span class="input-group-addon"><%= f.select :prefix, options_for_select(['+49', '+39']), :include_blank => true, :class => "input-group-addon"%></span>
+  <%= f.text_field :number, :class => "form-control", :placeholder => "000000000" %>
+  </div><br>
+  <hr>
+  <br>
+  <div><%= check_box("user", "terms") %> 
+   <%= f.label :terms, "Ho letto e accetto" %>
+   <a href="/regolamento" target="_blank">Regolamento</a> e <a href="/regolamento"  target="_blank"> Informativa sulla Privacy</a>
+   <%= f.label :terms, "ai sensi dell'art. 13 del D.Lgs 196/03" %> 
+   </div></p>
+<hr>
+  <div><%= f.submit "Registrati", :class => "btn btn-primary btn-lg btn-block" %></div>
+<% end %>
+

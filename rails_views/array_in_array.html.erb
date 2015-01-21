@@ -1,0 +1,65 @@
+<h1>Welcome to  SparringCRM</h1>
+<p>Now you can start managing better your clients and prospects</p>
+<p id="notice"><%= notice %></p>
+
+
+<div class="col-md-12">
+<% @statuses.select {|status| status.contacts.count >= 0}.each do |status| %>
+<div class="<%= cycle("arrow_box_red", "arrow_box_orange", "arrow_box_green", "arrow_box_dark_green","arrow_box_blue","arrow_box_dark_blue") -%>">
+	 <p class="value-arrow" id="tables-hover-rows"><%= status.value %><br>
+		<%= status.contacts.count %>
+	 </p>
+ </div>
+<% end %>
+</div>
+
+<br><br><br><br>
+<% @statuses.select {|status| status.contacts.count >= 0}.each do |status| %>
+ <div class="white-text <%= cycle("box_red", "box_orange", "box_green", "box_dark_green","box_blue","box_dark_blue") -%>" id="tables-hover-rows"><%= status.value %></div>
+  <div class="bs-example" data-example-id="hoverable-table">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Value</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>ID</th>
+        </tr>
+      </thead>
+      <tbody>
+     	<% status.contacts.select {|status| status.user == current_user}.each do |contact| %>
+        <tr>
+          <th scope="row"><%= contact.value %></th>
+          <td><%= contact.name %></td>
+          <td><%= contact.email %></td>
+          <td><%= contact.id %></td>
+          <td><%= link_to 'Show', contact %></td>
+          <td>
+          <%= link_to 'Edit',  '#', 'data-target' => "#myModal_#{contact.id}", 'data-toggle' => 'modal'  %>
+          <div class="modal fade" id='<%= "myModal_#{contact.id}" %>' tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                </div>
+                <div class="modal-body">
+                  <%= render 'contacts/modal', contact: contact %>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+              </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+        </td>
+        <td><%= link_to 'Destroy', contact, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        </tr>
+       	<% end %>
+      </tbody>
+    </table>
+  </div><!-- /example -->
+<% end %>
+
+<%= link_to 'New Contact', new_contact_path %>

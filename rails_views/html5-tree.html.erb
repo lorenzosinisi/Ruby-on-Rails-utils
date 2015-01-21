@@ -1,0 +1,169 @@
+<div class="hero-unit-home">
+<!-- Section 1 --><!--  With this code I'm creating a user profile that shows a Tree in HTML5 that grows basing on the amount and frequency of your posts during the time you are logged in -->
+<section id="intro" data-speed="6" data-type="background">
+	<div class="col-md-8">
+	<h1><%= @user.username %></h1><hr>
+	<h3><%= @user.posts.count %> dreams posted and <%= @user.comments.count %> reviews.</h3><hr>
+	<p></p>
+	<p>
+	
+	</p>
+	</div>
+      <ul class="panel-body">
+	     Dreamer level:<div class="progress progress-striped active">
+		     <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: <%= @agepercentage*100 %>%">
+		                	       
+		     </div>
+		     </div>
+		     <%= link_to 'Share new Dream now!', new_post_path, :class => 'btn btn-lg btn-success' %>
+	      </ul>
+	
+</section>
+
+	<div class="controls">
+	<div>
+
+	<input style="display: none" id="angle_range" type="range" min="5" max="90" value="35" step="5" onchange="init()" />
+		<span style="display: none" id="angle_span">		</span>
+	</div>
+	<div>
+
+	<input style="display: none" id="complexity_range" type="range" min="0.41" max="0.75" value="<%= @agepercentage %>" step="0.01" onchange="init()" />
+		<span style="display: none" id="complexity_span"></span>
+		</div>
+	<div>
+
+	<input style="display: none" id="flexure_range" type="range" min="-90" max="90" value="<%= @postperday %>" step="10" onchange="init()" />
+	<span style="display: none" id="flexure_span"></span>
+	</div>
+<button style="display: none" type="button" onclick="init_colors()">Change colors</button>
+</div>
+<canvas id="canvas" style="width: 100%"></canvas>
+	<script type="text/javascript">
+		window.onload = init_colors();
+		
+		var r_init, g_init, b_init, r_delta, g_delta, b_delta;
+		
+		function init_colors()
+		{
+			r_init = parseInt(Math.random() * 255);
+			g_init = parseInt(Math.random() * 255);
+			b_init = parseInt(Math.random() * 255);
+			r_delta = parseInt(25 + Math.random() * 25);
+			g_delta = parseInt(25 + Math.random() * 25);
+			b_delta = parseInt(25 + Math.random() * 25);
+			init();
+		}
+			
+		function init() 
+		{
+			var canvas = document.getElementById("canvas");
+			var ctx = canvas.getContext("2d");
+			var W = window.innerWidth;
+			var H = window.innerHeight;
+			canvas.width = W;
+			canvas.height = H - 80;
+			
+			var length, angle, reduction, line_width, start_points = [];
+			
+			draw();
+			
+			function draw()
+			{
+				ctx.fillStyle = "brown";
+				ctx.fillRect(0,0,0,100);
+				
+				length = 150;
+				reduction = parseFloat(document.getElementById("complexity_range").value);
+				document.getElementById("complexity_span").innerHTML=reduction;
+				line_width = 20;
+				angle = parseInt(document.getElementById("angle_range").value);
+				document.getElementById("angle_span").innerHTML=angle;		
+				flexure = parseInt(document.getElementById("flexure_range").value);
+				document.getElementById("flexure_span").innerHTML=flexure;
+		
+				var trunk = {x: canvas.width/2, y: length+50, angle: 90};
+				start_points = []; 
+				start_points.push(trunk);	
+				ctx.globalCompositeOperation = "lighter";		
+				ctx.beginPath();
+				ctx.moveTo(trunk.x, H-50);
+				ctx.lineTo(trunk.x, H-trunk.y);
+				r =  r_init;
+				g =  g_init;
+				b =  b_init;
+				if(length < 10) ctx.strokeStyle = "green";
+				else ctx.strokeStyle = "brown";
+				ctx.lineWidth = line_width;
+				ctx.lineCap = 'round';
+				ctx.lineJoin = 'round';
+				ctx.stroke();		
+				branches();
+			}
+			
+			function branches()
+			{
+				length = length * reduction;
+				line_width = line_width * reduction;
+				ctx.lineWidth = line_width;
+				
+				var new_start_points = [];
+				ctx.beginPath();
+				for(var i = 0; i < start_points.length; i++)
+				{			
+					var sp = start_points[i];
+					var ep1 = get_endpoint(sp.x, sp.y, sp.angle+angle, length);
+					var ep2 = get_endpoint(sp.x, sp.y, sp.angle-angle, length);
+					ctx.moveTo(sp.x, H-sp.y);
+					ctx.lineTo(ep1.x, H-ep1.y);
+					ctx.moveTo(sp.x, H-sp.y);
+					ctx.lineTo(ep2.x, H-ep2.y);
+					ep1.angle = sp.angle+angle - flexure;
+					ep2.angle = sp.angle-angle - flexure;			
+					new_start_points.push(ep1);
+					new_start_points.push(ep2);
+				}
+				ctx.stroke();
+				start_points = new_start_points;
+				r = r + r_delta;
+				if(r < 0 || r > 255) 
+				{
+					r_delta = -r_delta;
+				}
+				g = g + g_delta;
+				if(g < 0 || g > 255) 
+				{
+					g_delta = -g_delta;
+				}
+				b = b + b_delta;
+				if(b < 0 || b > 255) 
+				{
+					b_delta = -b_delta;
+				}
+				ctx.strokeStyle = "green";			
+				if(length > 2) branches();
+			}
+			
+			function get_endpoint(x, y, a, length)
+			{
+				var epx = x + length * Math.cos(a*Math.PI/180);
+				var epy = y + length * Math.sin(a*Math.PI/180);
+				return {x: epx, y: epy};
+			}
+		}
+	</script>
+
+	<section id="home" data-speed="4" data-type="background" >
+	  <% @user.posts.each do |post| %>
+	    <p>
+	     <div style="font-size: 18px"> 
+	     <%= link_to truncate(post.text, :length => 80), post, :class => 'row marketing'  %>
+	     </p>
+	    	     <div style="font-size: 10px;"> <i class="icon-calendar"></i> <%= time_ago_in_words post.updated_at %> ago | <i class="icon-comment"></i> <%= link_to 'comment', post  %></div>
+	     
+	     <hr>
+	     </div>	  
+	  <% end %>
+	</section>
+<!-- Section 2 -->
+</div>
